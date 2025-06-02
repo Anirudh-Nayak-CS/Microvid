@@ -1,0 +1,11 @@
+{
+  "name": "Newtube",
+  "version": "1.0.0",
+  "description": "Setting up the backend for an app which is similar to youtube ",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Anirudh Nayak",
+  "license": "ISC"
+}
