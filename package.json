@@ -1,5 +1,5 @@
 {
-  "name": "Newtube",
+  "name": "microvid",
   "version": "1.0.0",
   "description": "Setting up the backend for an app which is similar to youtube ",
   "main": "index.js",
@@ -12,5 +12,12 @@
   "devDependencies": {
     "nodemon": "^3.1.10",
     "prettier": "^3.5.3"
+  },
+  "dependencies": {
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.0",
+    "express": "^5.1.0",
+    "mongoose": "^8.16.4"
   }
 }
