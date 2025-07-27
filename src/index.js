@@ -1,7 +1,10 @@
 import dotenv from "dotenv";
+dotenv.config({
+  path: "./.env",
+});
+
 import { connectToDB } from "./db/connection.js";
 import { app } from "./app.js";
-dotenv.config();
 
 connectToDB()
   .then(() => {
