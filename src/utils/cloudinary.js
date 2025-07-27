@@ -11,7 +11,6 @@ const uploadFileOnCloudinary = async (path) => {
   try {
     if (!path) return null;
     const uploadResult = await cloudinary.uploader.upload(path, {
-      public_id: "shoes",
       resource_type: "auto",
     });
 
