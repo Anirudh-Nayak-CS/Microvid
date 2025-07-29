@@ -3,6 +3,12 @@ import { ApiError } from "../utils/Apierror.js";
 import { User } from "../models/user.model.js";
 import { uploadFileOnCloudinary } from "../utils/cloudinary.js";
 import { ApiResponse } from "../utils/Apiresponse.js";
+import jwt from "jsonwebtoken";
+
+const options = {
+  httpOnly: true,
+  secure: false,
+};
 
 const generateAccessTokenAndRefreshToken = async function (userid) {
   try {
@@ -110,10 +116,6 @@ const loginUser = asyncHandler(async (req, res) => {
     "-password -refreshToken"
   );
 
-  const options = {
-    httpOnly: true,
-    secure: true,
-  };
   res
     .status(200)
     .cookie("accesstoken", accessToken, options)
@@ -139,15 +141,37 @@ const logoutUser = asyncHandler(async (req, res) => {
     },
     { new: true }
   );
-  const options = {
-    httpOnly: true,
-    secure: true,
-  };
+
   return res
     .status(200)
     .clearCookie("accesstoken", options)
     .clearCookie("refreshtoken", options)
-    .json(new ApiError({}, 200, "User logged out"));
+    .json(new ApiResponse(null, 200, "User logged out"));
 });
 
-export { registerUser, loginUser, logoutUser };
+const refreshAccessToken = asyncHandler(async (req, res) => {
+  const receivedRefreshToken =
+    req.cookies?.refreshtoken || req.body.refreshtoken; //req.body is to handle mobile apps bcs built in cookie mechanism isn't present.
+  if (!receivedRefreshToken)
+    throw new ApiError(401, "Unauthorized request. No refreshtoken received.");
+
+try {
+    const decodedToken = jwt.verify(
+      receivedRefreshToken,
+      process.env.REFRESH_TOKEN_SECRET
+    );
+    const user = await User.findById(decodedToken?._id);
+  
+    if (!user) throw new ApiError(401, "Invalid refresh token.");
+  
+    if (receivedRefreshToken != user?.refreshToken)
+      throw new ApiError(401, "Refresh token is expired.");
+    
+    const {accessToken,newrefreshToken}=await generateAccessTokenAndRefreshToken(user._id);
+    res.status(200).cookie("accesstoken",accessToken,options).cookie("refreshtoken",newrefreshToken,options).json(new ApiResponse({accessToken,refreshToken: newrefreshToken},200,"Access tokenn refreshed and generated new refresh token"))
+} catch (error) {
+  throw new ApiError(401,error?.message || "Something went wrong while refreshing access token.")
+}
+});
+
+export { registerUser, loginUser, logoutUser ,refreshAccessToken};
