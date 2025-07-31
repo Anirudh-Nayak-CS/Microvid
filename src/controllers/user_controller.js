@@ -4,7 +4,7 @@ import { User } from "../models/user.model.js";
 import { uploadFileOnCloudinary } from "../utils/cloudinary.js";
 import { ApiResponse } from "../utils/Apiresponse.js";
 import jwt from "jsonwebtoken";
-import { Subscription } from "../models/subscription.model.js";
+import mongoose from "mongoose";
 
 const options = {
   httpOnly: true,
@@ -139,7 +139,9 @@ const logoutUser = asyncHandler(async (req, res) => {
   await User.findByIdAndUpdate(
     req.user._id,
     {
-      $set: { refreshToken: undefined },
+      $unset: {
+        refreshToken: 1, // this removes the refreshToken from the document
+      },
     },
     { new: true }
   );
@@ -193,8 +195,8 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
 const changeCurrentPassword = asyncHandler(async (req, res) => {
   const { newPassword, oldPassword } = req.body;
   const user = await User.findById(req.user?._id);
-  const res = await user.isPasswordCorrect(oldPassword, user.password);
-  if (!res) throw new ApiError(401, "Old password is incorrect");
+  const response = await user.isPasswordCorrect(oldPassword, user.password);
+  if (!response) throw new ApiError(401, "Old password is incorrect");
   user.password = newPassword; //password is hashed before saving to db (due to pre hook)
   await user.save({ validateBeforeSave: false });
 
@@ -313,7 +315,7 @@ const getUserChannelProfile = asyncHandler(async (req, res) => {
       },
     },
   ]);
-  if (!channel?.length()) {
+  if (!channel?.length) {
     throw new ApiError(404, "channel not found.");
   }
   console.log(channel);
@@ -365,7 +367,7 @@ const getWatchHistory = asyncHandler(async (req, res) => {
       },
     },
   ]);
-  if (!user?.length())
+  if (!userWatchHistory?.length)
     throw new ApiError(404, "Failed fetching User's watchHistory");
 
   return res
