@@ -4,6 +4,7 @@ import { User } from "../models/user.model.js";
 import { uploadFileOnCloudinary } from "../utils/cloudinary.js";
 import { ApiResponse } from "../utils/Apiresponse.js";
 import jwt from "jsonwebtoken";
+import { Subscription } from "../models/subscription.model.js";
 
 const options = {
   httpOnly: true,
@@ -257,6 +258,69 @@ const updateCoverImage = asyncHandler(async (req, res) => {
     .json(new ApiResponse(user, 200, "Updated CoverImage successfully"));
 });
 
+const getUserChannelProfile=asyncHandler(async(req,res)=> {
+   const {username}=req.params;
+   if(!username?.trim())
+    throw new ApiError(400,"username not found")
+  const channel=await User.aggregate([
+    {
+     $match: {
+      username:username?.trim().toLowerCase(),
+     },
+    },
+    {
+      $lookup:{
+        from: "subscriptions",
+        localField: "_id",
+        foreignField: "channel",
+        as: "subscribers"
+       }
+      
+    },
+     {
+      $lookup:{
+        from: "subscriptions",
+        localField: "_id",
+        foreignField: "subscriber",
+        as: "subscribedTo",
+       }
+      
+    },
+    {
+      $addFields: {
+        subscribersCount:{
+             $size:"$subscribers",
+        },
+        subscribedToCount:{
+           $size:"$subscribedTo",
+        },
+        isSubscribed:
+          { $cond: { if: { $in:[req.user?._id,"$subscribers.subscriber"]}, then: true, else: false }, }
+        },
+      
+    },
+    {
+      $project:{
+        fullName:1,
+        username:1,
+         subscribersCount:1,
+          subscribedToCount:1,
+          isSubscribed:1,
+          avatar:1,
+          coverImage:1,
+          email:1,
+
+      }
+    }
+  ])
+  if(!channel?.length()) {
+    throw new ApiError(404,"channel not found.")
+  }
+console.log(channel)
+return res.status(200).json(new ApiResponse(channel[0],200,"User's channel found."))
+
+})
+
 export {
   registerUser,
   loginUser,
@@ -267,4 +331,5 @@ export {
   updateUserDetails,
   updateAvatar,
   updateCoverImage,
+  getUserChannelProfile,
 };
