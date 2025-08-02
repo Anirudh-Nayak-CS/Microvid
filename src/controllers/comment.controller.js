@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose, { isValidObjectId } from "mongoose";
 import { Comment } from "../models/comment.model.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
@@ -6,6 +6,8 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 
 const getVideoComments = asyncHandler(async (req, res) => {
   const { videoId } = req.params;
+   if (!isValidObjectId(videoId))
+      throw new ApiError(400, "Invalid video ID.");
   const { page = 1, limit = 10 } = req.query;
 
   const getVideoComments =  Comment.aggregate([
@@ -67,6 +69,8 @@ const getVideoComments = asyncHandler(async (req, res) => {
 const addComment = asyncHandler(async (req, res) => {
   const { content } = req.body;
   const { videoId } = req.params;
+    if (!isValidObjectId(videoId))
+      throw new ApiError(400, "Invalid video ID.");
   if (!content) throw new ApiError(400, "No content received from user.");
 
   const createdComment = await Comment.create({
@@ -86,6 +90,8 @@ const addComment = asyncHandler(async (req, res) => {
 
 const updateComment = asyncHandler(async (req, res) => {
   const { commentId } = req.params;
+    if (!isValidObjectId(commentId))
+      throw new ApiError(400, "Invalid comment ID.");
   const { newContent } = req.body;
   if (!newContent) throw new ApiError(400, "No content received from user.");
   const updatedComment = await Comment.findByIdAndUpdate(
@@ -104,7 +110,8 @@ const updateComment = asyncHandler(async (req, res) => {
 
 const deleteComment = asyncHandler(async (req, res) => {
   const { commentId } = req.params;
-
+ if (!isValidObjectId(commentId))
+      throw new ApiError(400, "Invalid comment ID.");
   const deletedComment = await Comment.findByIdAndDelete(commentId);
 
   if (!deletedComment) throw new ApiError(404, "No comment found");

@@ -22,6 +22,8 @@ const createTweet = asyncHandler(async (req, res) => {
 
 const getUserTweets = asyncHandler(async (req, res) => {
   const { userId } = req.params;
+      if (!isValidObjectId(userId))
+      throw new ApiError(400, "Invalid user ID.");
   const userTweets=await Tweet.aggregate([
     {
         $match:{
@@ -55,6 +57,8 @@ const getUserTweets = asyncHandler(async (req, res) => {
 const updateTweet = asyncHandler(async (req, res) => {
   const { updatedcontent } = req.body;
   const { tweetId } = req.params;
+      if (!isValidObjectId(tweetId))
+      throw new ApiError(400, "Invalid tweet ID.");
   if (!updatedcontent) throw new ApiError(400, "Content for tweet is absent.");
 
   const updatedTweet = await Tweet.findByIdAndUpdate(
@@ -74,7 +78,8 @@ const updateTweet = asyncHandler(async (req, res) => {
 
 const deleteTweet = asyncHandler(async (req, res) => {
   const { tweetId } = req.params;
-
+    if (!isValidObjectId(tweetId))
+      throw new ApiError(400, "Invalid tweet ID.");
   const deletedTweet = await Tweet.findByIdAndDelete(tweetId);
 
   if (!deletedTweet) throw new ApiError(404, "No tweet found");
