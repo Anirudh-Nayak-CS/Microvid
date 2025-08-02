@@ -2,10 +2,6 @@ import mongoose from "mongoose";
 
 const likesSchema = mongoose.Schema(
   {
-    name: {
-      type: string,
-      required: true,
-    },
     comment: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Comment",

@@ -4,7 +4,7 @@ import mongooseAggregatePaginate from "mongoose-aggregate-paginate-v2";
 const commentsSchema = mongoose.Schema(
   {
     content: {
-      type: string,
+      type: String,
       required: true,
     },
     owner: {
