@@ -51,7 +51,7 @@ const getUserTweets = asyncHandler(async (req, res) => {
   if(!userTweets)
     throw new ApiError(404, "No tweets by the user.");
 
-  res.status(200).json(new ApiResponse(userTweets,200,"User tweets fetched successfully."))
+  res.status(200).json(new ApiResponse(userTweets[0],200,"User tweets fetched successfully."))
 });
 
 const updateTweet = asyncHandler(async (req, res) => {

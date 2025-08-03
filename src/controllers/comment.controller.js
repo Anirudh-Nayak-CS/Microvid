@@ -9,6 +9,12 @@ const getVideoComments = asyncHandler(async (req, res) => {
    if (!isValidObjectId(videoId))
       throw new ApiError(400, "Invalid video ID.");
   const { page = 1, limit = 10 } = req.query;
+  const pages=parseInt(page)||1
+   const limits=parseInt(limit)||10
+  const options={
+    limit:limits,
+    page:pages,
+  }
 
   const getVideoComments =  Comment.aggregate([
     {
@@ -44,10 +50,7 @@ const getVideoComments = asyncHandler(async (req, res) => {
       },
     },
   ]);
-  const options = {
-    limit: limit,
-    page: page,
-  };
+
   if (!getVideoComments)
     throw new ApiError(404, "No comments found for this video.");
   const paginatedComments = await Comment.aggregatePaginate(

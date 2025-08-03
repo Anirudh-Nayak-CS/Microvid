@@ -84,7 +84,7 @@ const getUserChannelSubscribers = asyncHandler(async (req, res) => {
     .status(200)
     .json(
       new ApiResponse(
-        subscribers,
+        subscribers[0],
         200,
         "Successfully fetched channel subscribers."
       )
@@ -134,7 +134,7 @@ const getSubscribedChannels = asyncHandler(async (req, res) => {
     .status(200)
     .json(
       new ApiResponse(
-        subscribers,
+        subscribedchannels[0],
         200,
         "Successfully fetched subscribed channels."
       )
