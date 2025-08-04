@@ -1,8 +1,8 @@
 import mongoose, { isValidObjectId } from "mongoose";
 import { User } from "../models/user.model.js";
 import { Subscription } from "../models/subscription.model.js";
-import { ApiError } from "../utils/ApiError.js";
-import { ApiResponse } from "../utils/ApiResponse.js";
+import { ApiError } from "../utils/Apierror.js";
+import { ApiResponse } from "../utils/Apiresponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 
 const toggleSubscription = asyncHandler(async (req, res) => {
@@ -54,10 +54,10 @@ const getUserChannelSubscribers = asyncHandler(async (req, res) => {
     },
     {
       $lookup: {
-        from: "users",
-        localField: "channel",
-        foreignField: "_id",
-        as: "channelsubscribers",
+          from: "users",
+         localField: "subscriber",     
+         foreignField: "_id",
+         as: "subscribers", 
         pipeline: [
           {
             $project: {
@@ -69,13 +69,7 @@ const getUserChannelSubscribers = asyncHandler(async (req, res) => {
         ],
       },
     },
-    {
-      $addFields: {
-        channelSubscribers: {
-          $first: "$channelsubscribers",
-        },
-      },
-    },
+  
   ]);
   if (!subscribers) {
     throw new ApiError(404, "Subscribers not found.");
@@ -84,7 +78,7 @@ const getUserChannelSubscribers = asyncHandler(async (req, res) => {
     .status(200)
     .json(
       new ApiResponse(
-        subscribers[0],
+        subscribers,
         200,
         "Successfully fetched channel subscribers."
       )
@@ -99,13 +93,13 @@ const getSubscribedChannels = asyncHandler(async (req, res) => {
   const subscribedchannels = await Subscription.aggregate([
     {
       $match: {
-        subscriber: new mongoose.Types.ObjectId(channelId),
+        subscriber: new mongoose.Types.ObjectId(subscriberId),
       },
     },
     {
       $lookup: {
         from: "users",
-        localField: "subscriber",
+        localField: "channel",
         foreignField: "_id",
         as: "subscribedTo",
         pipeline: [
@@ -119,13 +113,7 @@ const getSubscribedChannels = asyncHandler(async (req, res) => {
         ],
       },
     },
-    {
-      $addFields: {
-        subscribedTo: {
-          $first: "$subscribedTo",
-        },
-      },
-    },
+  
   ]);
   if (!subscribedchannels) {
     throw new ApiError(404, "No subscribed channels  found.");
@@ -134,7 +122,7 @@ const getSubscribedChannels = asyncHandler(async (req, res) => {
     .status(200)
     .json(
       new ApiResponse(
-        subscribedchannels[0],
+        subscribedchannels,
         200,
         "Successfully fetched subscribed channels."
       )

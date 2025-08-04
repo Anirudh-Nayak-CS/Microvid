@@ -1,12 +1,12 @@
 import mongoose, { isValidObjectId } from "mongoose";
 import { Playlist } from "../models/playlist.model.js";
-import { ApiError } from "../utils/ApiError.js";
-import { ApiResponse } from "../utils/ApiResponse.js";
+import { ApiError } from "../utils/Apierror.js";
+import { ApiResponse } from "../utils/Apiresponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 
 const createPlaylist = asyncHandler(async (req, res) => {
   const { name, description } = req.body;
-  if (!(name && description)) throw new ApiError(400, "Missing credentials.");
+  if (!(name && description)) throw new ApiError(400, "Name and description are required.");
   const addPlaylist = await Playlist.create({
     name: name,
     description: description,
@@ -40,7 +40,7 @@ const getPlaylistById = asyncHandler(async (req, res) => {
   if (!isValidObjectId(playlistId))
     throw new ApiError(400, "Invalid playlist ID.");
   const playlist = await Playlist.findById(playlistId);
-  if (!playlist) throw new ApiError(404, "Playlist not found.");
+  if (playlist.length === 0) throw new ApiError(404, "Playlist not found.");
   res
     .status(200)
     .json(new ApiResponse(playlist, 200, "Playlist fetched successfully"));
@@ -86,6 +86,12 @@ const removeVideoFromPlaylist = asyncHandler(async (req, res) => {
     },
     { new: true }
   );
+  if (!removedVid) throw new ApiError(404, "Playlist not found.");
+   res
+    .status(200)
+    .json(
+      new ApiResponse(removedVid, 200, "Video removed from playlist successfully")
+    );
 });
 
 const deletePlaylist = asyncHandler(async (req, res) => {
@@ -107,7 +113,7 @@ const updatePlaylist = asyncHandler(async (req, res) => {
     throw new ApiError(400, "Invalid playlist ID.");
   const { name, description } = req.body;
   if (!(name && description)) throw new ApiError(400, "Missing credentials.");
-  const updatedplaylist = await Playlist.findByIdAndUpdated(
+  const updatedplaylist = await Playlist.findByIdAndUpdate(
     playlistId,
     { name: name, description: description },
     { new: true }

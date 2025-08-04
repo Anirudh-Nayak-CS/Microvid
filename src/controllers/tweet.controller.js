@@ -1,8 +1,8 @@
 import mongoose, { isValidObjectId } from "mongoose";
 import { Tweet } from "../models/tweet.model.js";
 import { User } from "../models/user.model.js";
-import { ApiError } from "../utils/ApiError.js";
-import { ApiResponse } from "../utils/ApiResponse.js";
+import { ApiError } from "../utils/Apierror.js";
+import { ApiResponse } from "../utils/Apiresponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 
 const createTweet = asyncHandler(async (req, res) => {
@@ -55,15 +55,15 @@ const getUserTweets = asyncHandler(async (req, res) => {
 });
 
 const updateTweet = asyncHandler(async (req, res) => {
-  const { updatedcontent } = req.body;
+  const { content } = req.body;
   const { tweetId } = req.params;
       if (!isValidObjectId(tweetId))
       throw new ApiError(400, "Invalid tweet ID.");
-  if (!updatedcontent) throw new ApiError(400, "Content for tweet is absent.");
+  if (!content) throw new ApiError(400, "Content for tweet is absent.");
 
   const updatedTweet = await Tweet.findByIdAndUpdate(
     tweetId,
-    { content: updatedcontent },
+    { content: content },
     { new: true }
   );
 

@@ -1,8 +1,8 @@
 import mongoose, { isValidObjectId } from "mongoose";
 import { Video } from "../models/video.model.js";
 import { User } from "../models/user.model.js";
-import { ApiError } from "../utils/ApiError.js";
-import { ApiResponse } from "../utils/ApiResponse.js";
+import { ApiError } from "../utils/Apierror.js";
+import { ApiResponse } from "../utils/Apiresponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { uploadFileOnCloudinary } from "../utils/cloudinary.js";
 
@@ -123,13 +123,13 @@ const updateVideo = asyncHandler(async (req, res) => {
   if (!newdescription) throw new ApiError(400, "Missing description.");
   const thumbnailPath = req.file?.path;
   if (!thumbnailPath) throw new ApiError(400, "Thumbnail is required.");
-  const thumbnailurl = await uploadFileOnCloudinary(thumbnailPath);
-  if (!thumbnailurl)
+  const thumbnail = await uploadFileOnCloudinary(thumbnailPath);
+  if (!thumbnail)
     throw new ApiError(400, "Error while uploading Thumbnail to cloudinary.");
 
   const updatedVideo = await Video.findByIdAndUpdate(
     videoId,
-    { title: newtitle, description: newdescription, thumbnail: thumbnailurl },
+    { title: newtitle, description: newdescription, thumbnail: thumbnail.url },
     { new: true }
   );
   if (!updatedVideo) throw new ApiError(404, "Video not found.");
