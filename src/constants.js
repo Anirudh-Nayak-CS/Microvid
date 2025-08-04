@@ -1,1 +1,1 @@
-export const DB_NAME="Microvid"
+export const DB_NAME = "Microvid";

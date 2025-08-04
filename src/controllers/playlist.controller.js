@@ -6,7 +6,8 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 
 const createPlaylist = asyncHandler(async (req, res) => {
   const { name, description } = req.body;
-  if (!(name && description)) throw new ApiError(400, "Name and description are required.");
+  if (!(name && description))
+    throw new ApiError(400, "Name and description are required.");
   const addPlaylist = await Playlist.create({
     name: name,
     description: description,
@@ -21,7 +22,7 @@ const createPlaylist = asyncHandler(async (req, res) => {
 const getUserPlaylists = asyncHandler(async (req, res) => {
   const { userId } = req.params;
   if (!isValidObjectId(userId)) throw new ApiError(400, "Invalid user ID.");
-  const userplaylists = await Playlist.find({owner:userId});
+  const userplaylists = await Playlist.find({ owner: userId });
   if (!userplaylists)
     throw new ApiError(404, "No playlists of the user exists.");
   res
@@ -87,10 +88,14 @@ const removeVideoFromPlaylist = asyncHandler(async (req, res) => {
     { new: true }
   );
   if (!removedVid) throw new ApiError(404, "Playlist not found.");
-   res
+  res
     .status(200)
     .json(
-      new ApiResponse(removedVid, 200, "Video removed from playlist successfully")
+      new ApiResponse(
+        removedVid,
+        200,
+        "Video removed from playlist successfully"
+      )
     );
 });
 

@@ -11,7 +11,7 @@ import { verifyJWT } from "../middlewares/auth.middleware.js";
 import { upload } from "../middlewares/multer.js";
 
 const router = Router();
-router.use(verifyJWT); 
+router.use(verifyJWT);
 
 router
   .route("/")

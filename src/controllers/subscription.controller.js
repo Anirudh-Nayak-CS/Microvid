@@ -54,10 +54,10 @@ const getUserChannelSubscribers = asyncHandler(async (req, res) => {
     },
     {
       $lookup: {
-          from: "users",
-         localField: "subscriber",     
-         foreignField: "_id",
-         as: "subscribers", 
+        from: "users",
+        localField: "subscriber",
+        foreignField: "_id",
+        as: "subscribers",
         pipeline: [
           {
             $project: {
@@ -69,7 +69,6 @@ const getUserChannelSubscribers = asyncHandler(async (req, res) => {
         ],
       },
     },
-  
   ]);
   if (!subscribers) {
     throw new ApiError(404, "Subscribers not found.");
@@ -113,7 +112,6 @@ const getSubscribedChannels = asyncHandler(async (req, res) => {
         ],
       },
     },
-  
   ]);
   if (!subscribedchannels) {
     throw new ApiError(404, "No subscribed channels  found.");
