@@ -32,4 +32,9 @@ app.use("/api/v1/likes", likeRouter);
 app.use("/api/v1/playlist", playlistRouter);
 app.use("/api/v1/dashboard", dashboardRouter);
 
+
+    app.get('/', (req, res) => {
+  res.send('Microvid API is live.');
+   });
+
 export { app };
