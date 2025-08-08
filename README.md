@@ -27,6 +27,11 @@ A robust backend for a YouTube-like video sharing platform, built with Node.js, 
 
 ---
 
+---
+## API DOCUMENTATION
+https://documenter.getpostman.com/view/43115208/2sB3BDLBUv
+---
+
 ## 📁 Project Structure
 
 ```
